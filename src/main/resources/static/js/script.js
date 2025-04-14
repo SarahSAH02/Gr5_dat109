@@ -1,4 +1,3 @@
-// Når dokumentet er lastet
 document.addEventListener('DOMContentLoaded', function() {
 
     // Legger til hover-effekt for emojis
@@ -13,12 +12,14 @@ document.addEventListener('DOMContentLoaded', function() {
             button.style.transform = 'scale(1)';
         });
 
-        // Legger til event listener for å registrere klikk på emoji-knappene
         button.addEventListener('click', function() {
-            const color = button.classList.contains('emoji-green') ? 'green' :
-                          button.classList.contains('emoji-yellow') ? 'yellow' : 'red';
-            
-            alert(`Du valgte en ${color} emoji!`);
+            const selectedColor = button.getAttribute('data-color');
+            const hiddenInput = document.getElementById('color');
+            hiddenInput.value = selectedColor;
+
+            // Visuell feedback: f.eks. markere valgt emoji
+            emojiButtons.forEach(b => b.classList.remove('selected'));
+            button.classList.add('selected');
         });
     });
 

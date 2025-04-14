@@ -41,17 +41,9 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
 }
 
-h1 {
-    font-size: 2.5rem;
-}
-
-h2 {
-    font-size: 2rem;
-}
-
-h3 {
-    font-size: 1.75rem;
-}
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
 
 p {
     margin-bottom: 1rem;
@@ -155,10 +147,7 @@ select {
     transition: var(--transition);
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"]:focus,
-input[type="date"]:focus,
+input:focus,
 textarea:focus,
 select:focus {
     outline: none;
@@ -237,9 +226,10 @@ input[type="submit"]:hover {
     display: flex;
     justify-content: space-around;
     margin: 1.5rem 0;
+    gap: 1rem;
 }
 
-.emoji {
+.emoji-button {
     font-size: 2rem;
     cursor: pointer;
     padding: 1rem;
@@ -251,23 +241,32 @@ input[type="submit"]:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.emoji:hover {
+.emoji-button:hover {
     transform: scale(1.1);
 }
 
-#green {
+.emoji-button.selected {
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.3);
+    transform: scale(1.1);
+    border-color: var(--secondary-color);
+}
+
+.emoji-green {
     background-color: rgba(39, 174, 96, 0.1);
     color: var(--success-color);
 }
 
-#yellow {
+.emoji-yellow {
     background-color: rgba(243, 156, 18, 0.1);
     color: var(--warning-color);
 }
 
-#red {
+.emoji-red {
     background-color: rgba(231, 76, 60, 0.1);
     color: var(--danger-color);
 }
@@ -328,31 +327,119 @@ input[type="submit"]:hover {
     transform: translateY(-2px);
 }
 
-/* Responsive Design */
+/* Submit Section */
+.submit-section {
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 2rem;
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+}
+
+.submit-section h2 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.submit-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.submit-section input[type="submit"],
+.submit-section button {
+    background-color: var(--secondary-color);
+}
+
+/* Statistics Section */
+.statistics-section {
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.statistics-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.statistics-section .stat-box {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    width: 45%;
+    text-align: center;
+}
+
+.statistics-section .stat-box:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.statistics-section .stat-box .stat-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.statistics-section .stat-box .stat-value {
+    font-size: 2rem;
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+.statistics-section .stat-box .stat-value.success {
+    color: var(--success-color);
+}
+
+.statistics-section .stat-box .stat-value.warning {
+    color: var(--warning-color);
+}
+
+.statistics-section .stat-box .stat-value.danger {
+    color: var(--danger-color);
+}
+
+.statistics-section .chart-container {
+    margin-top: 2rem;
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+}
+
+.statistics-section .chart-container canvas {
+    width: 100%;
+    height: 400px;
+}
+
+.statistics-section .stat-message {
+    margin-top: 1.5rem;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Responsive Design for Statistics */
 @media (max-width: 768px) {
-    html {
-        font-size: 14px;
+    .statistics-section .stat-box {
+        width: 100%;
     }
-    
-    nav ul {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .emoji-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-    
-    .emoji {
-        width: 60px;
-        height: 60px;
-        font-size: 1.5rem;
-    }
-    
-    section {
+
+    .statistics-section .chart-container {
         padding: 1rem;
+    }
+
+    .statistics-section .stat-message {
+        font-size: 1rem;
     }
 }
