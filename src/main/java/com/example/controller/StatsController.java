@@ -35,9 +35,13 @@ public class StatsController {
         return "stats";
     }
 
-    @GetMapping("/api/stats/{lectureId}")
-    @ResponseBody
-    public StatsDTO getLectureStats(@PathVariable Long lectureId) {
-        return feedbackService.getStatsForLecture(lectureId);
+    @GetMapping("/api/stats/{lectureTitle}")
+@ResponseBody
+public StatsDTO getLectureStatsByTitle(@PathVariable String lectureTitle) {
+    Lecture lecture = lectureService.findByTitle(lectureTitle);
+    if (lecture == null) {
+        throw new IllegalArgumentException("Forelesning ikke funnet: " + lectureTitle);
     }
+    return feedbackService.getStatsForLecture(lecture.getId());
+}
 }

@@ -5,43 +5,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Tilbakemelding</title>
+    <title>Gi Tilbakemelding</title>
     <link rel="stylesheet" href="<c:url value='/css/styles.css' />">
     <script src="<c:url value='/js/script.js' />" defer></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header, footer {
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        section {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .emoji-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .emoji-button {
+            font-size: 36px;
+            padding: 20px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .emoji-button:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .selected {
+            outline: 3px solid #28a745;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>Send Tilbakemelding</h1>
+        <h1>Tilbakemeldingsskjema</h1>
         <nav>
             <ul>
                 <li><a href="<c:url value='/dashboard' />">Dashboard</a></li>
                 <li><a href="<c:url value='/lectures' />">Se forelesninger</a></li>
-                <li><a href="<c:url value='/stats' />">Se statistikk</a></li>
+                <li><a href="<c:url value='/submit' />">Send inn tilbakemelding</a></li>
             </ul>
         </nav>
     </header>
 
     <section>
-        <h2>Statistikk for Forelesning</h2>
-        <!-- Form for selecting the lecture to see statistics -->
-        <form id="statsForm">
-            <label for="lectureId">Velg Forelesning:</label>
+        <h2>Gi Tilbakemelding på Forelesning</h2>
+        <form action="<c:url value='/feedback/submit' />" method="POST">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+
+            <label for="lectureId">Velg forelesning:</label><br>
             <select id="lectureId" name="lectureId" required>
                 <c:forEach items="${lectures}" var="lecture">
                     <option value="${lecture.id}">${lecture.title}</option>
                 </c:forEach>
-            </select>
-            <button type="submit">Hent statistikk</button>
-        </form>
+            </select><br><br>
 
-        <!-- Placeholder for feedback stats -->
-        <div id="feedbackStats" style="display: none;">
-            <h3>Antall Tilbakemeldinger: <span id="totalFeedback"></span></h3>
-            <h3>Fordeling etter farge:</h3>
-            <canvas id="feedbackChart"></canvas>
-            <h3>Kommentarer:</h3>
-            <ul id="commentsList"></ul>
-        </div>
+            <label for="color">Vurder forelesningen:</label><br>
+            <div class="emoji-container">
+                <div class="emoji-button emoji-green" data-color="GREEN" title="Bra 😊">😊</div>
+                <div class="emoji-button emoji-yellow" data-color="YELLOW" title="Middels 😐">😐</div>
+                <div class="emoji-button emoji-red" data-color="RED" title="Dårlig 😞">😞</div>
+            </div>
+            <input type="hidden" id="color" name="color" required><br><br>
+
+            <label for="comment">Kommentar:</label><br>
+            <textarea id="comment" name="comment" rows="4" placeholder="Skriv din kommentar her..." required></textarea><br><br>
+
+            <button type="submit">Send Tilbakemelding</button>
+        </form>
     </section>
 
     <footer>
@@ -49,73 +146,21 @@
     </footer>
 
     <script>
-        // Handle form submission and fetch stats from backend
-        document.getElementById('statsForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const lectureId = document.getElementById('lectureId').value;
+        // Emoji valg og oppdatering av skjult input
+        document.querySelectorAll('.emoji-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.emoji-button').forEach(btn => btn.classList.remove('selected'));
+                button.classList.add('selected');
+                document.getElementById('color').value = button.getAttribute('data-color');
+            });
+        });
 
-            // Show a loading message or spinner while fetching data
-            document.getElementById('feedbackStats').style.display = 'none';
-            const totalFeedbackElem = document.getElementById('totalFeedback');
-            totalFeedbackElem.textContent = 'Henter data...';
-
-            // Fetch the statistics for the selected lecture
-            fetch(`/api/stats/${lectureId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Display the total number of feedbacks
-                    totalFeedbackElem.textContent = data.total;
-
-                    // Display the feedback stats section
-                    document.getElementById('feedbackStats').style.display = 'block';
-
-                    // Display the comments
-                    const commentsList = document.getElementById('commentsList');
-                    commentsList.innerHTML = ''; // Clear previous comments
-                    data.comments.forEach(comment => {
-                        const li = document.createElement('li');
-                        li.textContent = comment;
-                        commentsList.appendChild(li);
-                    });
-
-                    // Create chart for color distribution
-                    const ctx = document.getElementById('feedbackChart').getContext('2d');
-                    const chart = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: ['Grønn', 'Gul', 'Rød'],
-                            datasets: [{
-                                label: 'Fordeling av Tilbakemeldinger',
-                                data: [
-                                    data.byColor.GREEN || 0,
-                                    data.byColor.YELLOW || 0,
-                                    data.byColor.RED || 0
-                                ],
-                                backgroundColor: ['#4CAF50', '#FFEB3B', '#F44336'],
-                                borderColor: ['#fff', '#fff', '#fff'],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: { position: 'top' },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(tooltipItem) {
-                                            return tooltipItem.raw + ' tilbakemeldinger';
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                })
-                .catch(error => {
-                    // Handle errors here
-                    console.error('Feil ved henting av statistikk:', error);
-                    totalFeedbackElem.textContent = 'Kunne ikke hente statistikk. Prøv igjen senere.';
-                });
+        // Validering: krever at en emoji er valgt
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!document.getElementById('color').value) {
+                e.preventDefault();
+                alert('Vennligst velg en vurdering med emoji.');
+            }
         });
     </script>
 </body>
